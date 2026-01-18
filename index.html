@@ -2,17 +2,27 @@
 <html>
 <head>
   <title>Pi Login Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
 <body>
   <h1>Pi Login Demo</h1>
+
   <button id="loginBtn">Login with Pi</button>
-  <div id="userInfo"></div>
+  <div id="userInfo" style="margin-top: 10px;"></div>
 
   <!-- Pi SDK -->
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
   <script>
-    // Initialize Pi SDK
-    Pi.init({ version: "2.0" });
+    // SAFETY CHECK
+    if (typeof Pi === "undefined") {
+      alert("Please open this app in Pi Browser");
+    }
+
+    // IMPORTANT: appId MUST match your Pi Developer subdomain
+    Pi.init({
+      version: "2.0",
+      appId: "fpl"
+    });
 
     const loginBtn = document.getElementById("loginBtn");
     const userInfo = document.getElementById("userInfo");
@@ -22,7 +32,7 @@
         const auth = await Pi.authenticate(["username"]);
         userInfo.innerHTML = `<h2>Logged in as: ${auth.user.username}</h2>`;
       } catch (err) {
-        alert("Login failed: " + err);
+        alert("Login failed: " + JSON.stringify(err));
       }
     });
   </script>
