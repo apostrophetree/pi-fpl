@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pi Login Demo</title>
+</head>
+<body>
+  <h1>Pi Login Demo</h1>
+  <button id="loginBtn">Login with Pi</button>
+  <div id="userInfo"></div>
+
+  <!-- Pi SDK -->
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+  <script>
+    // Initialize Pi SDK
+    Pi.init({ version: "2.0" });
+
+    const loginBtn = document.getElementById("loginBtn");
+    const userInfo = document.getElementById("userInfo");
+
+    loginBtn.addEventListener("click", async () => {
+      try {
+        const auth = await Pi.authenticate(["username"]);
+        userInfo.innerHTML = `<h2>Logged in as: ${auth.user.username}</h2>`;
+      } catch (err) {
+        alert("Login failed: " + err);
+      }
+    });
+  </script>
+</body>
+</html>
