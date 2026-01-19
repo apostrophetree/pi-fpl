@@ -67,65 +67,58 @@
     <div class="status" id="status">Waiting for login…</div>
   </div>
 
-  <script>
-    // 1️⃣ INIT PI SDK
-    Pi.init({
-      version: "2.0",
-      
-    });
+ <script>
+  // Load Pi SDK dynamically and wait for it to finish
+  const sdkScript = document.createElement("script");
+  sdkScript.src = "https://sdk.minepi.com/pi-sdk.js";
+  sdkScript.onload = () => {
+    console.log("Pi SDK loaded:", window.Pi);
+
+    Pi.init({ version: "2.0" });
 
     const statusEl = document.getElementById("status");
     const loginBtn = document.getElementById("loginBtn");
     const payBtn = document.getElementById("payBtn");
 
-    // 2️⃣ LOGIN (must be direct click)
-    loginBtn.onclick = function () {
+    loginBtn.onclick = () => {
       statusEl.innerText = "Opening Pi login…";
 
       Pi.authenticate(
         ["username"],
-        function (auth) {
+        (auth) => {
           statusEl.innerText = "Logged in as: " + auth.user.username;
           payBtn.style.display = "block";
         },
-        function (err) {
+        (err) => {
           statusEl.innerText = "Login failed: " + JSON.stringify(err);
         }
       );
     };
 
-    // 3️⃣ TESTNET PAYMENT
-    payBtn.onclick = function () {
+    payBtn.onclick = () => {
       statusEl.innerText = "Creating testnet payment…";
 
       Pi.createPayment(
         {
           amount: 0.1,
           memo: "Pi FPL Test Payment",
-          metadata: { purpose: "test" }
+          metadata: { purpose: "test" },
         },
         {
-          onReadyForServerApproval: function (paymentId) {
-            console.log("Payment ID:", paymentId);
-          },
-          onReadyForServerCompletion: function (paymentId, txid) {
+          onReadyForServerApproval: (paymentId) => console.log("Payment ID:", paymentId),
+          onReadyForServerCompletion: (paymentId, txid) => {
             statusEl.innerText = "Payment completed ✔";
             console.log(paymentId, txid);
           },
-          onCancel: function (paymentId) {
-            statusEl.innerText = "Payment cancelled";
-          },
-          onError: function (err) {
-            statusEl.innerText = "Payment error: " + JSON.stringify(err);
-          }
+          onCancel: (paymentId) => (statusEl.innerText = "Payment cancelled"),
+          onError: (err) => (statusEl.innerText = "Payment error: " + JSON.stringify(err)),
         }
       );
     };
+  };
+  document.head.appendChild(sdkScript);
+</script>
 
-    // DEBUG
-    console.log("Pi object:", window.Pi);
-    console.log("URL:", window.location.href);
-  </script>
 
 </body>
 </html>
